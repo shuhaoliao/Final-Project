@@ -18,12 +18,15 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
+import com.bumptech.glide.Glide;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "douyin";
     private RecyclerView mRecyclerView;
     private MyAdapter mAdapter;
     MyLayoutManager myLayoutManager;
+    ImageView myCover;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
