@@ -35,9 +35,6 @@ public class MainActivity extends AppCompatActivity {
     ImageView myCover;
     ImageView maddVideo;
 
-    private static final int REQUEST_VIDEO_CAPTURE = 1;
-    private static final int REQUEST_EXTERNAL_CAMERA = 101;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
