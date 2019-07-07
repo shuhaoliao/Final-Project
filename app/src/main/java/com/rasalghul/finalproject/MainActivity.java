@@ -1,15 +1,21 @@
 package com.rasalghul.finalproject;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.OrientationHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
     private MyAdapter mAdapter;
     MyLayoutManager myLayoutManager;
     ImageView myCover;
+    ImageView maddVideo;
+
+    private static final int REQUEST_VIDEO_CAPTURE = 1;
+    private static final int REQUEST_EXTERNAL_CAMERA = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        maddVideo = findViewById(R.id.add_video);
         mRecyclerView = findViewById(R.id.recycler);
         myLayoutManager = new MyLayoutManager(this, OrientationHelper.VERTICAL, false);
 
@@ -70,6 +81,12 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG, "选择位置:" + position + " 下一页:" + bottom);
 
                 playVideo(0);
+            }
+        });
+        maddVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, RecordVideoActivity.class));
             }
         });
     }
