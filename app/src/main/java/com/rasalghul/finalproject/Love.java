@@ -7,18 +7,23 @@ import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
+import android.view.GestureDetector.SimpleOnGestureListener;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
 
 import java.util.Random;
+import java.util.zip.Inflater;
 
-public class Love extends RelativeLayout {
+public class Love extends RelativeLayout{
     private Context mContext;
+    private GestureDetector gestureDetector;
     float[] num = {-30, -20, 0, 20, 30};//随机心形图片角度
 
     public Love(Context context) {
@@ -38,40 +43,87 @@ public class Love extends RelativeLayout {
 
     private void initView(Context context) {
         mContext = context;
+        gestureDetector = new GestureDetector(mContext, new GestureDetector.OnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent motionEvent) {
+                return false;
+            }
+
+            @Override
+            public void onShowPress(MotionEvent motionEvent) {
+
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent motionEvent) {
+                return false;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+                return false;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent motionEvent) {
+
+            }
+
+            @Override
+            public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+                return false;
+            }
+        });
+        gestureDetector.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener(){
+            @Override
+            public boolean onDoubleTap(MotionEvent event) {
+                final ImageView imageView = new ImageView(mContext);
+                LayoutParams params = new LayoutParams(300, 300);
+                params.leftMargin = (int) event.getX() - 150;
+                params.topMargin = (int) event.getY() - 300;
+                imageView.setImageDrawable(getResources().getDrawable(R.mipmap.icon_home_like_after));
+                imageView.setLayoutParams(params);
+                addView(imageView);
+
+                AnimatorSet animatorSet = new AnimatorSet();
+                animatorSet.play(scale(imageView, "scaleX", 2f, 0.9f, 100, 0))
+                        .with(scale(imageView, "scaleY", 2f, 0.9f, 100, 0))
+                        .with(rotation(imageView, 0, 0, num[new Random().nextInt(4)]))
+                        .with(alpha(imageView, 0, 1, 100, 0))
+                        .with(scale(imageView, "scaleX", 0.9f, 1, 50, 150))
+                        .with(scale(imageView, "scaleY", 0.9f, 1, 50, 150))
+                        .with(translationY(imageView, 0, -600, 800, 400))
+                        .with(alpha(imageView, 1, 0, 300, 400))
+                        .with(scale(imageView, "scaleX", 1, 3f, 700, 400))
+                        .with(scale(imageView, "scaleY", 1, 3f, 700, 400));
+
+                animatorSet.start();
+                animatorSet.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        removeViewInLayout(imageView);
+                    }
+                });
+               return false;
+            }
+
+            @Override
+            public boolean onDoubleTapEvent(MotionEvent motionEvent) {
+                return false;
+            }
+
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
+                return false;
+            }
+        });
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-
-        final ImageView imageView = new ImageView(mContext);
-        LayoutParams params = new LayoutParams(300, 300);
-        params.leftMargin = (int) event.getX() - 150;
-        params.topMargin = (int) event.getY() - 300;
-        imageView.setImageDrawable(getResources().getDrawable(R.mipmap.icon_home_like_after));
-        imageView.setLayoutParams(params);
-        addView(imageView);
-
-        AnimatorSet animatorSet = new AnimatorSet();
-        animatorSet.play(scale(imageView, "scaleX", 2f, 0.9f, 100, 0))
-                .with(scale(imageView, "scaleY", 2f, 0.9f, 100, 0))
-                .with(rotation(imageView, 0, 0, num[new Random().nextInt(4)]))
-                .with(alpha(imageView, 0, 1, 100, 0))
-                .with(scale(imageView, "scaleX", 0.9f, 1, 50, 150))
-                .with(scale(imageView, "scaleY", 0.9f, 1, 50, 150))
-                .with(translationY(imageView, 0, -600, 800, 400))
-                .with(alpha(imageView, 1, 0, 300, 400))
-                .with(scale(imageView, "scaleX", 1, 3f, 700, 400))
-                .with(scale(imageView, "scaleY", 1, 3f, 700, 400));
-
-        animatorSet.start();
-        animatorSet.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                removeViewInLayout(imageView);
-            }
-        });
-        return super.onTouchEvent(event);
+        gestureDetector.onTouchEvent(event);
+        return false;
     }
 
     public static ObjectAnimator scale(View view, String propertyName, float from, float to, long time, long delayTime) {

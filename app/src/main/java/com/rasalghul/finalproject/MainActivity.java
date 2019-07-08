@@ -1,5 +1,6 @@
 package com.rasalghul.finalproject;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -23,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
@@ -30,7 +32,11 @@ import com.rasalghul.finalproject.Bean.Feed;
 import com.rasalghul.finalproject.Bean.FeedResponse;
 import com.rasalghul.finalproject.network.IMiniDouyinService;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -53,14 +59,46 @@ public class MainActivity extends AppCompatActivity {
     private MyLayoutManager myLayoutManager;
     private ImageView myCover;
     private ImageView maddVideo;
+    private static final int REQUEST_PERMISSION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getPermission();
         initData();
         initView();
         initListener();
+    }
+
+    private void getPermission() {
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(MainActivity.this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(MainActivity.this,
+                        Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ) {
+            //todo 在这里申请相机、存储的权限
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.RECORD_AUDIO
+            }, REQUEST_PERMISSION);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PERMISSION: {
+                //todo 判断权限是否已经授予
+                if(grantResults[0]==PackageManager.PERMISSION_GRANTED
+                        && grantResults[1]==PackageManager.PERMISSION_GRANTED
+                        && grantResults[2]==PackageManager.PERMISSION_GRANTED);
+                else finish();
+                break;
+            }
+        }
     }
 
     private void initView() {
@@ -75,12 +113,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initData(){
-        ActivityCompat.requestPermissions(this, new String[]{
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.INTERNET,
-                Manifest.permission.ACCESS_NETWORK_STATE
-        }, 1);
         Retrofit retrofit = new Retrofit.Builder().baseUrl("http://test.androidcamp.bytedance.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
@@ -131,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         maddVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, RecordVideoActivity.class));
+                startActivity(new Intent(MainActivity.this, CustomCameraActivity.class));
             }
         });
     }
@@ -159,10 +191,12 @@ public class MainActivity extends AppCompatActivity {
             if(mFeeds.size()>0){
                 Feed feed = mFeeds.get(position);
                 //holder.img_thumb.setImageResource(imgs[index]);
-                Uri vuri = Uri.parse(feed.getVideo_url());
                 holder.videoView.setVideoURI(Uri.parse(feed.getVideo_url()));
-//                retriever.setDataSource(feed.getVideo_url());
-//                holder.img_thumb.setImageBitmap(retriever.getFrameAtTime());
+                retriever.setDataSource(feed.getVideo_url(),new HashMap());
+                holder.img_thumb.setImageBitmap(retriever.getFrameAtTime());
+                holder.name.setText("@"+feed.getUser_name());
+                holder.date.setText(feed.getCreatedAt());
+
 
 //                index++;
 //                if (index >= mFeeds.size()) {
@@ -191,6 +225,8 @@ public class MainActivity extends AppCompatActivity {
             VideoView videoView;
             ImageView img_play;
             RelativeLayout rootView;
+            TextView name;
+            TextView date;
 
             public ViewHolder(View itemView) {
                 super(itemView);
@@ -198,6 +234,8 @@ public class MainActivity extends AppCompatActivity {
                 videoView = itemView.findViewById(R.id.video_view);
                 img_play = itemView.findViewById(R.id.img_play);
                 rootView = itemView.findViewById(R.id.root_view);
+                name = itemView.findViewById(R.id.name);
+                date = itemView.findViewById(R.id.date);
             }
         }
     }
@@ -235,8 +273,8 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-
         //videoView.start();
+        imgPlay.animate().alpha(1).start();
 
         imgPlay.setOnClickListener(new View.OnClickListener() {
             boolean isPlaying = true;

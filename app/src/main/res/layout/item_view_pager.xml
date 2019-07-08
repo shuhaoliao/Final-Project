@@ -91,6 +91,31 @@
         android:layout_centerInParent="true"
         />
 
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft = "20dp"
+        android:layout_marginBottom="80dp"
+        android:gravity="left"
+        android:text=""
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="46dp"
+        android:gravity="left"
+        android:text=""
+        android:textColor="@android:color/white" />
+
     <com.rasalghul.finalproject.Love
         android:layout_width="match_parent"
         android:layout_height="match_parent"></com.rasalghul.finalproject.Love>

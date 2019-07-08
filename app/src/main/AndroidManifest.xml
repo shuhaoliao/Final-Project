@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.rasalghul.finalproject">
 
     <uses-feature android:name="android.hardware.camera" />
@@ -18,8 +19,20 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/buaa"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
+        tools:ignore="GoogleAppIndexingWarning"
         android:theme="@style/AppTheme">
+        <!--<provider-->
+            <!--android:name="androidx.core.content.FileProvider"-->
+            <!--android:authorities="com.bytedance.camera.demo"-->
+            <!--android:exported="false"-->
+            <!--android:grantUriPermissions="true">-->
+            <!--<meta-data-->
+                <!--android:name="android.support.FILE_PROVIDER_PATHS"-->
+                <!--android:resource="@xml/file_paths" />-->
+        <!--</provider>-->
         <activity android:name=".RecordVideoActivity"></activity>
+        <activity android:name=".CustomCameraActivity"></activity>
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait">
