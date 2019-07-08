@@ -11,6 +11,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -25,20 +26,39 @@ import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
+import com.rasalghul.finalproject.Bean.Feed;
+import com.rasalghul.finalproject.Bean.FeedResponse;
+import com.rasalghul.finalproject.network.IMiniDouyinService;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "douyin";
     private RecyclerView mRecyclerView;
     private MyAdapter mAdapter;
-    MyLayoutManager myLayoutManager;
-    ImageView myCover;
-    ImageView maddVideo;
+    private List<Feed> mFeeds = new ArrayList<>();
+    private String[] urls;
+    private MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+    private MyLayoutManager myLayoutManager;
+    private ImageView myCover;
+    private ImageView maddVideo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        initData();
         initView();
         initListener();
     }
@@ -51,6 +71,35 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = new MyAdapter(this);
         mRecyclerView.setLayoutManager(myLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
+
+    }
+
+    private void initData(){
+        ActivityCompat.requestPermissions(this, new String[]{
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.INTERNET,
+                Manifest.permission.ACCESS_NETWORK_STATE
+        }, 1);
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://test.androidcamp.bytedance.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        IMiniDouyinService request = retrofit.create(IMiniDouyinService.class);
+        Call<FeedResponse> call = request.getFeed();
+        call.enqueue(new Callback<FeedResponse>() {
+            @Override
+            public void onResponse(Call<FeedResponse> call, Response<FeedResponse> response) {
+                Log.e(TAG, "onResponse: Receive successfully!");
+                if (response.body()!=null) mFeeds = response.body().getFeeds();
+                //mRv.getAdapter().notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Call<FeedResponse> call, Throwable t) {
+                Log.e(TAG, "onFailure: Receive fail!");
+                Log.e(TAG, "onFailure: Receive fail!");
+            }
+        });
 
     }
 
@@ -91,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
     class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         private int[] imgs = {R.mipmap.img_video_1, R.mipmap.img_video_2, R.mipmap.img_video_3, R.mipmap.img_video_4, R.mipmap.img_video_5, R.mipmap.img_video_6, R.mipmap.img_video_7, R.mipmap.img_video_8};
         private int[] videos = {R.raw.video_1, R.raw.video_2, R.raw.video_3, R.raw.video_4, R.raw.video_5, R.raw.video_6, R.raw.video_7, R.raw.video_8};
+
         private int index = 0;
         private Context mContext;
 
@@ -107,10 +157,14 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.img_thumb.setImageResource(imgs[index]);
-            holder.videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + videos[index]));
+            Feed feed = mFeeds.get(index);
+            //holder.img_thumb.setImageResource(imgs[index]);
+            holder.videoView.setVideoURI(Uri.parse(feed.getVideo_url()));
+            retriever.setDataSource(feed.getVideo_url());
+            holder.img_thumb.setImageBitmap(retriever.getFrameAtTime());
+
             index++;
-            if (index >= 7) {
+            if (index >= mFeeds.size()) {
                 index = 0;
             }
         }
@@ -170,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        videoView.start();
+        //videoView.start();
 
         imgPlay.setOnClickListener(new View.OnClickListener() {
             boolean isPlaying = true;
