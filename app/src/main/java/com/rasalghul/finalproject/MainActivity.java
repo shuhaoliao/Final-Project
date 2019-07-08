@@ -89,15 +89,14 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<FeedResponse>() {
             @Override
             public void onResponse(Call<FeedResponse> call, Response<FeedResponse> response) {
-                Log.e(TAG, "onResponse: Receive successfully!");
+                Log.d(TAG, "onResponse: Receive successfully!");
                 if (response.body()!=null) mFeeds = response.body().getFeeds();
                 //mRv.getAdapter().notifyDataSetChanged();
             }
 
             @Override
             public void onFailure(Call<FeedResponse> call, Throwable t) {
-                Log.e(TAG, "onFailure: Receive fail!");
-                Log.e(TAG, "onFailure: Receive fail!");
+                Log.d(TAG, "onFailure: Receive fail!");
             }
         });
 
@@ -157,17 +156,30 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            Feed feed = mFeeds.get(index);
-            //holder.img_thumb.setImageResource(imgs[index]);
-            holder.videoView.setVideoURI(Uri.parse(feed.getVideo_url()));
-            retriever.setDataSource(feed.getVideo_url());
-            holder.img_thumb.setImageBitmap(retriever.getFrameAtTime());
+            if(mFeeds.size()>0){
+                Feed feed = mFeeds.get(position);
+                //holder.img_thumb.setImageResource(imgs[index]);
+                Uri vuri = Uri.parse(feed.getVideo_url());
+                holder.videoView.setVideoURI(Uri.parse(feed.getVideo_url()));
+//                retriever.setDataSource(feed.getVideo_url());
+//                holder.img_thumb.setImageBitmap(retriever.getFrameAtTime());
 
-            index++;
-            if (index >= mFeeds.size()) {
-                index = 0;
+//                index++;
+//                if (index >= mFeeds.size()) {
+//                    index = 0;
+//                }
             }
         }
+
+//        @Override
+//        public void onBindViewHolder(ViewHolder holder, int position) {
+//            holder.img_thumb.setImageResource(imgs[index]);
+//            holder.videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + videos[index]));
+//            index++;
+//            if (index >= 7) {
+//                index = 0;
+//            }
+//        }
 
         @Override
         public int getItemCount() {
