@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private MediaMetadataRetriever retriever = new MediaMetadataRetriever();
     private MyLayoutManager myLayoutManager;
     private ImageView myCover;
-    private ImageView maddVideo;
+    private ImageView maddVideo,mRefresh;
     private static final int REQUEST_PERMISSION = 1;
 
     @Override
@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initView() {
         maddVideo = findViewById(R.id.add_video);
+        mRefresh = findViewById(R.id.vid_refresh);
         mRecyclerView = findViewById(R.id.recycler);
         myLayoutManager = new MyLayoutManager(this, OrientationHelper.VERTICAL, false);
 
@@ -123,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<FeedResponse> call, Response<FeedResponse> response) {
                 Log.d(TAG, "onResponse: Receive successfully!");
                 if (response.body()!=null) mFeeds = response.body().getFeeds();
-                //mRv.getAdapter().notifyDataSetChanged();
             }
 
             @Override
@@ -166,6 +166,12 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, CustomCameraActivity.class));
             }
         });
+        mRefresh.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                initData();
+            }
+        });
     }
 
     class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
@@ -205,15 +211,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-//        @Override
-//        public void onBindViewHolder(ViewHolder holder, int position) {
-//            holder.img_thumb.setImageResource(imgs[index]);
-//            holder.videoView.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/" + videos[index]));
-//            index++;
-//            if (index >= 7) {
-//                index = 0;
-//            }
-//        }
 
         @Override
         public int getItemCount() {
