@@ -15,9 +15,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/buaa"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/buaa"
+        android:icon="@mipmap/mr"
+        android:label="Mr"
+        android:roundIcon="@mipmap/mr"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"

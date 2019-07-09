@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getItemCount() {
-            return 88;
+            return mFeeds.size() == 0 ? 888 : mFeeds.size();
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
